@@ -9,9 +9,14 @@
 
 using namespace Seep;
 
-MemRec::MemRec(Type type)
+MemRec::MemRec(Type type, const void *val)
     : _type(type)
-{}
+{
+    if (type == Type::String) {
+        value._pstr = new std::string();
+    }
+    reassign(val);
+}
 
 MemRec::MemRec(MemRec &&src) noexcept {
     std::swap(_type, src._type);
@@ -204,14 +209,4 @@ void MemRec::reassign(const void* val) {
             assert(!"Unhandled type");
         }
     }
-}
-
-
-MemRec::MemRec(Type type, const void *val)
-    : _type(type)
-{
-    if (type == Type::String) {
-        value._pstr = new std::string();
-    }
-    reassign(val);
 }

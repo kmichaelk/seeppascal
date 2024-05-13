@@ -97,8 +97,7 @@ class Seep::MemRec {
     Type _type = Type::Void;
 public:
     MemRec() = default;
-    explicit MemRec(Type type);
-    explicit MemRec(Type type, const void* val);
+    explicit MemRec(Type type, const void* val = nullptr);
 
     union {
         int _int;

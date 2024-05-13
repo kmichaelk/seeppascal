@@ -49,7 +49,7 @@ class PascalEvaluator : public PascalParserBaseVisitor
 
     Scope globals;
     std::stack<MemRec> st;
-    std::stack<size_t> sp;
+    std::stack<size_t> sp; // stack pointer
 
     const ProcStore& procedures;
 
@@ -60,9 +60,7 @@ class PascalEvaluator : public PascalParserBaseVisitor
         const auto sz = sp.top();
         sp.pop();
 
-        const auto diff = st.size() - sz;
-
-        for (size_t i = 0; i < diff; i++) {
+        for (size_t i = st.size(); i > sz; i--) {
             st.pop();
         }
     }
@@ -423,7 +421,7 @@ public:
         st_save();
         //
         var.value._int  = std::any_cast<MemRec*>(visitExpression(ctx->forList()->initialValue()->expression()))->value._int;
-        int final_value = std::any_cast<MemRec*>(visitExpression(ctx->forList()->finalValue()->expression()))->value._int;
+        const int final_value = std::any_cast<MemRec*>(visitExpression(ctx->forList()->finalValue()->expression()))->value._int;
         //
         st_pop();
 

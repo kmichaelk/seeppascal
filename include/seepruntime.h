@@ -105,7 +105,7 @@ public:
         bool _bool;
         double _float;
         std::string* _pstr;
-    } value;
+    } value = {};
 
     MemRec(const MemRec& src) : _type(src._type), value(src.value) {
         if (_type == Type::String) {

@@ -183,7 +183,7 @@ public:
             throw ParserError("Unknown binary operator");
         }
 
-        const int val = it->second(*lhs, *rhs);
+        const bool val = it->second(*lhs, *rhs);
 
         auto res = MemRec(Type::Boolean, &val);
 

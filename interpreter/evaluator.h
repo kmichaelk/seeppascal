@@ -412,6 +412,26 @@ public:
 
         return {};
     }
+
+    std::any visitForStatement(PascalParser::ForStatementContext *ctx) override {
+        auto& var = globals[ctx->identifier()->getText()];
+
+        if (!BelongsToGroup(var.type(), TypeGroup::Numeric)) {
+            throw std::runtime_error("Only integers applicable as variables in for loop");
+        }
+
+        st_save();
+        //
+        var.value._int  = std::any_cast<MemRec*>(visitExpression(ctx->forList()->initialValue()->expression()))->value._int;
+        int final_value = std::any_cast<MemRec*>(visitExpression(ctx->forList()->finalValue()->expression()))->value._int;
+        //
+        st_pop();
+
+        while (var.value._int < final_value) {
+            visitStatement(ctx->statement());
+            var.value._int++;
+        }
+    }
 };
 
 #endif // SEEP_INTERPRETER_EXECUTOR_H

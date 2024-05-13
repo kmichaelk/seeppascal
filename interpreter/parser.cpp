@@ -33,8 +33,8 @@ void Seep::Runtime::warm_up() {
     //
     new(frontend.parser) ANTLRPascalParser::PascalParser(frontend.tokens);
     frontend.parser->removeErrorListeners();
-    // frontend.parser->addErrorListener(new ParsingErrorListener());
-    frontend.parser->setErrorHandler(std::make_shared<antlr4::BailErrorStrategy>());
+    frontend.parser->addErrorListener(new ParsingErrorListener());
+    // frontend.parser->setErrorHandler(std::make_shared<antlr4::BailErrorStrategy>());
 
     //
     frontend.is_initialized = true;
@@ -45,12 +45,12 @@ void Seep::Runtime::execute()
     internals->frontend.parser->reset();
 
     ANTLRPascalParser::PascalParser::ProgramContext* tree;
-    // try {
+    try {
         tree = internals->frontend.parser->program();
-    // }
-    // catch (antlr4::ParseCancellationException& e) {
-    //     throw Seep::ParserError(e.what());
-    // }
+    }
+    catch (antlr4::ParseCancellationException& e) {
+        throw Seep::ParserError(e.what());
+    }
 
     PascalEvaluator executor(*this, debugger, internals->procedures);
     executor.visit(tree);

@@ -109,8 +109,27 @@ public:
         for (const auto& part : ctx->constantDefinitionPart()) {
             for (const auto& def : part->constantDefinition()) {
                 const auto& name = def->identifier()->getText();
-                const auto val = std::stod(def->constant()->getText());
-                globals.bind(name, MemRec(std::any_cast<Type>(visitType_(def->type_())), &val));
+                const auto raw = def->constant()->getText();
+
+                const auto type = std::any_cast<Type>(visitType_(def->type_()));
+
+                auto rec = MemRec(type);
+                if (BelongsToGroup(type, TypeGroup::Numeric)) {
+                    const int v = std::stoi(raw);
+                    rec.reassign(&v);
+                }
+                else if (BelongsToGroup(type, TypeGroup::Real)) {
+                    const double v = std::stod(raw);
+                    rec.reassign(&v);
+                }
+                else if (BelongsToGroup(type, TypeGroup::String)) {
+                    rec.reassign(&raw);
+                }
+                else {
+                    throw std::runtime_error("Unhandled type");
+                }
+
+                consts.bind(name, std::move(rec));
             }
         }
         consts.set_writable(false);

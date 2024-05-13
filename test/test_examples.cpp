@@ -27,6 +27,23 @@ TEST(Seep_Examples, BuiltinsRefs) {
     ASSERT_NO_THROW(rt.execute());
 }
 
+TEST(Seep_Examples, WhileLoops) {
+    ContextLeakingDebugger debugger([](Seep::Context& ctx) {
+        const Seep::MemRec* rec;
+
+        ASSERT_NO_THROW(rec = &ctx.vars().at("i"));
+        EXPECT_EQ(Seep::Type::Integer, rec->type());
+        EXPECT_EQ(10, rec->value._int);
+    });
+
+    std::stringstream ss;
+
+    Seep::Runtime rt(load_file("../../examples/while_loops.pas"), ss, ss);
+
+    ASSERT_NO_THROW(rt.warm_up());
+    ASSERT_NO_THROW(rt.execute());
+}
+
 TEST(Seep_Examples, example1) {
     ContextLeakingDebugger debugger([](Seep::Context& ctx) {
         const Seep::MemRec* rec;

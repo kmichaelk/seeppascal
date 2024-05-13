@@ -394,6 +394,24 @@ public:
 
         return {};
     }
+
+    std::any visitWhileStatement(PascalParser::WhileStatementContext *ctx) override {
+        while (true) {
+            st_save();
+            //
+            const bool result = std::any_cast<MemRec*>(visitExpression(ctx->expression()))->value._bool;
+            //
+            st_pop();
+
+            if (!result) {
+                break;
+            }
+
+            visitStatement(ctx->statement());
+        }
+
+        return {};
+    }
 };
 
 #endif // SEEP_INTERPRETER_EXECUTOR_H

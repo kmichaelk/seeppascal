@@ -163,6 +163,10 @@ bool MemRec::operator>(const MemRec& other) const noexcept {
 
 void MemRec::reassign(const void* val) {
     switch (_type) {
+        case Type::Boolean: {
+            MEM_ASSIGN(value._bool, val);
+            break;
+        }
         case Type::Integer: {
             MEM_ASSIGN(value._int, val);
             break;

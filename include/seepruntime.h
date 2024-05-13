@@ -102,6 +102,7 @@ public:
 
     union {
         int _int;
+        bool _bool;
         double _float;
         std::string* _pstr;
     } value;

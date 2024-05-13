@@ -185,11 +185,11 @@ public:
 
         const int val = it->second(*lhs, *rhs);
 
-        auto res = MemRec(Type::Integer, &val);
+        auto res = MemRec(Type::Boolean, &val);
 
         st_pop();
 
-        return st_alloc(std::move(res)); // todo: Boolean
+        return st_alloc(std::move(res));
     }
 
     std::any visitSimpleExpression(PascalParser::SimpleExpressionContext *ctx) override {
@@ -377,6 +377,22 @@ public:
             params.push_back(std::any_cast<MemRec*>(visitActualParameter(param)));
         }
         return params;
+    }
+
+    std::any visitIfStatement(PascalParser::IfStatementContext *ctx) override {
+        st_save();
+        //
+        const bool result = std::any_cast<MemRec*>(visitExpression(ctx->expression()))->value._bool;
+        //
+        st_pop();
+
+        if (result) {
+            visitStatement(ctx->statement(0));
+        } else {
+            visitStatement(ctx->statement(1));
+        }
+
+        return {};
     }
 };
 

@@ -21,6 +21,9 @@ Seep::MemRec& Scope::operator[](const name_t &name) {
 }
 
 void Scope::bind(const std::string& name, Seep::MemRec&& value) {
+    if (!writable) {
+        throw std::runtime_error("Scope is read-only");
+    }
     values[name] = std::move(value);
 }
 

@@ -76,7 +76,7 @@ TEST(Seep_Examples, example1) {
 
         const Seep::MemRec* rec;
 
-        ASSERT_NO_THROW(rec = &ctx.vars().at("Pi"));
+        ASSERT_NO_THROW(rec = &ctx.consts().at("Pi"));
         EXPECT_EQ(Seep::Type::Double, rec->type());
         EXPECT_TRUE(fabs(rec->value._float - 3.1415926) < 0.01);
 

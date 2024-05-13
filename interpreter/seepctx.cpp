@@ -20,3 +20,7 @@ const std::string& Seep::Context::get_program_name() const {
 const std::unordered_map<std::string, Seep::MemRec>& Seep::Context::vars() const {
     return state->globals->storage();
 }
+
+const std::unordered_map<std::string, Seep::MemRec>& Seep::Context::consts() const {
+    return state->globals->up()->storage();
+}

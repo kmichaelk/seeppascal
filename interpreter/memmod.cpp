@@ -19,7 +19,7 @@ MemRec::MemRec(Type type, const void *val)
     if (type == Type::Void || type == Type::Reference) {
         return;
     }
-    
+
     reassign(val);
 }
 

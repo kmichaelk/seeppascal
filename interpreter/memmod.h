@@ -15,11 +15,14 @@ class Scope {
 
     Scope* parent;
     std::unordered_map<name_t, Seep::MemRec> values;
+    bool writable = true;
 public:
     explicit Scope(Scope* parent = nullptr);
 
     [[nodiscard]] Seep::MemRec& operator[](const name_t& name);
     void bind(const std::string& name, Seep::MemRec&& value);
+
+    void set_writable(bool writable);
 
     [[nodiscard]] const decltype(values)& storage() const;
     [[nodiscard]] Scope* up() const;

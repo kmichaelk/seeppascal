@@ -150,6 +150,7 @@ struct Seep::Context {
     [[nodiscard]] const std::string& get_program_name() const;
 
     [[nodiscard]] const std::unordered_map<std::string, MemRec>& vars() const;
+    [[nodiscard]] const std::unordered_map<std::string, MemRec>& consts() const;
 };
 
 class Seep::Debugger {

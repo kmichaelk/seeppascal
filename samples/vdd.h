@@ -16,16 +16,13 @@
 
 class VariableDumpingDebugger : public Seep::Debugger {
 
-    void onAttach(Seep::Context& ctx) override {
-        std::cout << "--- VariableDumpingDebugger: Debugger attached\n\n";
-    }
-
-    void onFinish(Seep::Context& ctx) override {
-        std::cout << "\n--- VariableDumpingDebugger: Execution finished\n";
-        std::cout << "Global variables:\n";
-
-        for (const auto& rec : ctx.vars()) {
-            std::cout << "\t";
+    static void dump(const decltype(static_cast<Seep::Context*>(nullptr)->vars()) vars) {
+        std::cout << "\t";
+        if (vars.empty()) {
+            std::cout << "None" << std::endl;
+            return;
+        }
+        for (const auto& rec : vars) {
             std::cout << std::left << std::setw(10) << std::setfill(' ') << rec.first;
             std::cout << std::left << std::setw(20) << std::setfill(' ');
             switch (rec.second.type()) {
@@ -56,7 +53,7 @@ class VariableDumpingDebugger : public Seep::Debugger {
                     case Seep::Type::Double: {
                     std::cout << rec.second.value._float;
                     break;
-                }
+                    }
                 case Seep::Type::String: {
                     std::cout << *rec.second.value._pstr;
                     break;
@@ -69,6 +66,22 @@ class VariableDumpingDebugger : public Seep::Debugger {
             std::cout << std::right << std::setw(24) << std::setfill(' ') << &rec;
             std::cout << "\n";
         }
+    }
+
+    void onAttach(Seep::Context& ctx) override {
+        std::cout << "--- VariableDumpingDebugger: Debugger attached\n\n";
+    }
+
+    void onFinish(Seep::Context& ctx) override {
+        std::cout << "\n--- VariableDumpingDebugger: Execution finished\n";
+
+        std::cout << "Variables:\n";
+        dump(ctx.vars());
+
+        std::cout << "---\n";
+
+        std::cout << "Constants:\n";
+        dump(ctx.consts());
     }
 };
 

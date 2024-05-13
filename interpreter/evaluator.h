@@ -47,7 +47,9 @@ class PascalEvaluator : public PascalParserBaseVisitor
     Context::State rt_state;
     Context rt_ctx;
 
+    Scope consts;
     Scope globals;
+
     std::stack<MemRec> st;
     std::stack<size_t> sp; // stack pointer
 
@@ -78,6 +80,7 @@ public:
         , dbg(debugger)
         , rt_state({ &runtime, &globals })
         , rt_ctx(&rt_state)
+        , globals(&consts)
         , procedures(procedures) {
     }
 
@@ -110,6 +113,8 @@ public:
                 globals.bind(name, MemRec(std::any_cast<Type>(visitType_(def->type_())), &val));
             }
         }
+        consts.set_writable(false);
+
         for (const auto& part : ctx->variableDeclarationPart()) {
             for (const auto& decl : part->variableDeclaration()) {
                 const auto type = std::any_cast<Type>(visitType_(decl->type_()));

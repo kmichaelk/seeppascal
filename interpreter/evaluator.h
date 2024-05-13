@@ -85,6 +85,11 @@ public:
 
     std::any visitProgram(PascalParser::ProgramContext *ctx) override {
         visitProgramHeading(ctx->programHeading());
+
+        if (dbg) {
+            dbg->onAttach(rt_ctx);
+        }
+
         visitBlock(ctx->block());
 
         if (dbg) {
@@ -95,10 +100,6 @@ public:
 
     std::any visitProgramHeading(PascalParser::ProgramHeadingContext *ctx) override {
         rt_ctx.state->program_name = ctx->identifier()->getText();
-
-        if (dbg) {
-            dbg->onAttach(rt_ctx);
-        }
 
         return {};
     }

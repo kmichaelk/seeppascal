@@ -17,12 +17,12 @@
 class VariableDumpingDebugger : public Seep::Debugger {
 
     static void dump(const decltype(static_cast<Seep::Context*>(nullptr)->vars()) vars) {
-        std::cout << "\t";
         if (vars.empty()) {
-            std::cout << "None" << std::endl;
+            std::cout << "\tNone" << std::endl;
             return;
         }
         for (const auto& rec : vars) {
+            std::cout << "\t";
             std::cout << std::left << std::setw(10) << std::setfill(' ') << rec.first;
             std::cout << std::left << std::setw(20) << std::setfill(' ');
             switch (rec.second.type()) {

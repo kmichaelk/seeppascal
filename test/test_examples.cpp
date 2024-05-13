@@ -22,6 +22,7 @@ TEST(Seep_Examples, BuiltinsRefs) {
     ss.flush();
 
     Seep::Runtime rt(load_file("../../examples/builtins_refs.pas"), ss, ss);
+    rt.attach_debugger(&debugger);
 
     ASSERT_NO_THROW(rt.warm_up());
     ASSERT_NO_THROW(rt.execute());
@@ -39,6 +40,7 @@ TEST(Seep_Examples, WhileLoops) {
     std::stringstream ss;
 
     Seep::Runtime rt(load_file("../../examples/while_loops.pas"), ss, ss);
+    rt.attach_debugger(&debugger);
 
     ASSERT_NO_THROW(rt.warm_up());
     ASSERT_NO_THROW(rt.execute());
@@ -77,6 +79,7 @@ TEST(Seep_Examples, example1) {
     ss.flush();
 
     Seep::Runtime rt(load_file("../../examples/example1.pas"), ss, ss);
+    rt.attach_debugger(&debugger);
 
     ASSERT_NO_THROW(rt.warm_up());
     ASSERT_NO_THROW(rt.execute());

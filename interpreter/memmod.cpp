@@ -15,6 +15,11 @@ MemRec::MemRec(Type type, const void *val)
     if (type == Type::String) {
         value._pstr = new std::string();
     }
+
+    if (type == Type::Void || type == Type::Reference) {
+        return;
+    }
+    
     reassign(val);
 }
 

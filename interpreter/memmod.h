@@ -11,34 +11,18 @@
 #include <string>
 
 class Scope {
-    using TName = std::string;
+    using name_t = std::string;
 
     Scope* parent;
-    std::unordered_map<TName, Seep::MemRec> values;
+    std::unordered_map<name_t, Seep::MemRec> values;
 public:
-    explicit Scope(Scope* parent = nullptr)
-        : parent(parent)
-    {}
+    explicit Scope(Scope* parent = nullptr);
 
-    Seep::MemRec& operator[](const TName& name) {
-        for (auto* scope = this; scope != nullptr; scope = scope->parent) {
-            auto pair = scope->values.find(name);
-            if (pair == scope->values.end()) {
-                continue;
-            }
-            return pair->second;
-        }
+    [[nodiscard]] Seep::MemRec& operator[](const name_t& name);
+    void bind(const std::string& name, Seep::MemRec&& value);
 
-        throw std::runtime_error("Variable is not bound");
-    }
-
-    void bind(const std::string& name, Seep::MemRec&& value) {
-        values[name] = std::move(value);
-    }
-
-    const auto& storage() {
-        return values;
-    }
+    [[nodiscard]] const decltype(values)& storage() const;
+    [[nodiscard]] Scope* up() const;
 };
 
 #endif // SEEP_MEMORY_MODEL_H

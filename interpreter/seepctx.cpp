@@ -13,6 +13,6 @@ Seep::Runtime&  Seep::Context::get_runtime() const {
     return *state->runtime;
 }
 
-const std::unordered_map<std::string, Seep::MemRec> Seep::Context::vars() const {
+const std::unordered_map<std::string, Seep::MemRec>& Seep::Context::vars() const {
     return state->globals->storage();
 }

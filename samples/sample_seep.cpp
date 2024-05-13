@@ -72,6 +72,7 @@ class VariableDumpingDebugger : public Seep::Debugger {
                     break;
                 }
             }
+            cout << std::right << std::setw(24) << std::setfill(' ') << &*it;
             cout << "\n";
         }
     }

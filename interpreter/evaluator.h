@@ -193,8 +193,7 @@ public:
     }
 
     std::any visitSimpleExpression(PascalParser::SimpleExpressionContext *ctx) override {
-        // if (!ctx->additiveoperator()) {
-        if (ctx->children.size() == 1) {
+        if (!ctx->additiveoperator()) {
             return visitTerm(ctx->term());
         }
 

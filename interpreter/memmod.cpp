@@ -27,28 +27,40 @@ MemRec::~MemRec() {
 // Binary Arithmetic //
 
 template<typename BinaryOp>
-[[nodiscard]] MemRec binop(const MemRec& lhs, const MemRec& rhs, BinaryOp op) {
+[[nodiscard]] MemRec binop(const MemRec& lhs, const MemRec& rhs, BinaryOp op, bool to_real = false) {
     // if (lhs.type() != rhs.type()) {
     //     throw std::runtime_error("Incompatible types");
     // }
 
-    MemRec res(lhs.type());
-
-    switch (lhs.type()) {
-        case Type::Integer: {
-            res.value._int = op(lhs.value._int, rhs.value._int);
-            break;
+    if (BelongsToGroup(lhs.type(), TypeGroup::Numeric) && Seep::BelongsToGroup(rhs.type(), TypeGroup::Numeric)) {
+        if (to_real) {
+            MemRec res(Type::Double);
+            res.value._float = op(lhs.value._int, rhs.value._int);
+            return res;
         }
-        case Type::Double: {
-            res.value._float = op(lhs.value._float, rhs.value._float);
-            break;
-        }
-        default: {
-            throw std::runtime_error("Unsupported");
-        }
+        MemRec res(Type::Integer);
+        res.value._int = op(lhs.value._int, rhs.value._int);
+        return res;
     }
 
-    return res;
+   MemRec res(Type::Double);
+   if (BelongsToGroup(lhs.type(), TypeGroup::Real) && Seep::BelongsToGroup(rhs.type(), TypeGroup::Real)) {
+       res.value._float = op(lhs.value._float, rhs.value._float);
+   }
+   else if (BelongsToGroup(lhs.type(), TypeGroup::Numeric) && Seep::BelongsToGroup(rhs.type(), TypeGroup::Real)) {
+       res.value._float = op(lhs.value._int, rhs.value._float);
+   }
+   else if (BelongsToGroup(lhs.type(), TypeGroup::Real) && Seep::BelongsToGroup(rhs.type(), TypeGroup::Numeric)) {
+       res.value._float = op(lhs.value._float, rhs.value._int);
+   }
+   else {
+       throw std::runtime_error("TODO");
+   }
+   return res;
+}
+
+double divide_real(int lhs, int rhs) {
+    return static_cast<double>(lhs) / rhs;
 }
 
 MemRec MemRec::operator+(const MemRec& other) const {
@@ -78,7 +90,7 @@ MemRec MemRec::operator/(const MemRec& other) const {
     if (other.value._float == 0) {
         throw std::runtime_error("Division by zero");
     }
-    return binop(*this, other, std::divides<>{});
+    return binop(*this, other, divide_real, true);
 }
 
 MemRec MemRec::operator%(const MemRec& other) const {

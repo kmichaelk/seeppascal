@@ -9,6 +9,8 @@
 
 TEST(Seep_Examples, BuiltinsRefs) {
     ContextLeakingDebugger debugger([](Seep::Context& ctx) {
+        EXPECT_EQ("BuiltinsRefs", ctx.get_program_name());
+
         const Seep::MemRec* rec;
 
         ASSERT_NO_THROW(rec = &ctx.vars().at("n"));
@@ -30,6 +32,8 @@ TEST(Seep_Examples, BuiltinsRefs) {
 
 TEST(Seep_Examples, WhileLoops) {
     ContextLeakingDebugger debugger([](Seep::Context& ctx) {
+        EXPECT_EQ("WhileLoops", ctx.get_program_name());
+
         const Seep::MemRec* rec;
 
         ASSERT_NO_THROW(rec = &ctx.vars().at("i"));
@@ -48,6 +52,8 @@ TEST(Seep_Examples, WhileLoops) {
 
 TEST(Seep_Examples, ForLoops) {
     ContextLeakingDebugger debugger([](Seep::Context& ctx) {
+        EXPECT_EQ("ForLoops", ctx.get_program_name());
+
         const Seep::MemRec* rec;
 
         ASSERT_NO_THROW(rec = &ctx.vars().at("i"));
@@ -66,6 +72,8 @@ TEST(Seep_Examples, ForLoops) {
 
 TEST(Seep_Examples, example1) {
     ContextLeakingDebugger debugger([](Seep::Context& ctx) {
+        EXPECT_EQ("Example", ctx.get_program_name());
+
         const Seep::MemRec* rec;
 
         ASSERT_NO_THROW(rec = &ctx.vars().at("Pi"));

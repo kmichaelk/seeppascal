@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <sstream>
 #include <cassert>
@@ -13,11 +14,11 @@ using std::cout;
 using std::endl;
 
 
-#define ENUM_CASE(val)          \
-    case val: {                 \
-        cout << #val;           \
-        break;                  \
-    }                           \
+#define ENUM_CASE(val)                                                           \
+    case val: {                                                                  \
+        cout << #val;    \
+        break;                                                                   \
+    }                                                                            \
 
 class VariableDumpingDebugger : public Seep::Debugger {
 
@@ -30,7 +31,9 @@ class VariableDumpingDebugger : public Seep::Debugger {
         cout << "Global variables:\n";
 
         for (auto it = ctx.vars_begin(); it != ctx.vars_end(); ++it) {
-            cout << "\t" << it->first << "\t";
+            cout << "\t";
+            cout << std::left << std::setw(10) << std::setfill(' ') << it->first;
+            cout << std::left << std::setw(20) << std::setfill(' ');
             switch (it->second.type()) {
                 ENUM_CASE(Seep::Type::Boolean)
                 ENUM_CASE(Seep::Type::Char)
@@ -49,7 +52,7 @@ class VariableDumpingDebugger : public Seep::Debugger {
                     break;
                 }
             }
-            cout << "\t";
+            cout << std::right << std::setw(10) << std::setfill(' ');
             switch (it->second.type()) {
                 case Seep::Type::Integer: {
                     cout << it->second.value._int;

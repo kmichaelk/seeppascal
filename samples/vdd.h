@@ -24,11 +24,11 @@ class VariableDumpingDebugger : public Seep::Debugger {
         std::cout << "\n--- VariableDumpingDebugger: Execution finished\n";
         std::cout << "Global variables:\n";
 
-        for (auto it = ctx.vars_begin(); it != ctx.vars_end(); ++it) {
+        for (const auto& rec : ctx.vars()) {
             std::cout << "\t";
-            std::cout << std::left << std::setw(10) << std::setfill(' ') << it->first;
+            std::cout << std::left << std::setw(10) << std::setfill(' ') << rec.first;
             std::cout << std::left << std::setw(20) << std::setfill(' ');
-            switch (it->second.type()) {
+            switch (rec.second.type()) {
                 ENUM_CASE(Seep::Type::Boolean)
                 ENUM_CASE(Seep::Type::Char)
                 ENUM_CASE(Seep::Type::ShortInt)
@@ -47,18 +47,18 @@ class VariableDumpingDebugger : public Seep::Debugger {
                 }
             }
             std::cout << std::right << std::setw(10) << std::setfill(' ');
-            switch (it->second.type()) {
+            switch (rec.second.type()) {
                 case Seep::Type::Integer: {
-                    std::cout << it->second.value._int;
+                    std::cout << rec.second.value._int;
                     break;
                 }
                 case Seep::Type::Real:
                     case Seep::Type::Double: {
-                    std::cout << it->second.value._float;
+                    std::cout << rec.second.value._float;
                     break;
                 }
                 case Seep::Type::String: {
-                    std::cout << *it->second.value._pstr;
+                    std::cout << *rec.second.value._pstr;
                     break;
                 }
                 default: {
@@ -66,7 +66,7 @@ class VariableDumpingDebugger : public Seep::Debugger {
                     break;
                 }
             }
-            std::cout << std::right << std::setw(24) << std::setfill(' ') << &*it;
+            std::cout << std::right << std::setw(24) << std::setfill(' ') << &rec;
             std::cout << "\n";
         }
     }

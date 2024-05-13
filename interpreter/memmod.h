@@ -36,11 +36,8 @@ public:
         values[name] = std::move(value);
     }
 
-    auto begin() {
-        return values.begin();
-    }
-    auto end() {
-        return values.end();
+    const auto& storage() {
+        return values;
     }
 };
 

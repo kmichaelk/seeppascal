@@ -73,6 +73,69 @@ class PascalEvaluator : public PascalParserBaseVisitor
         return &st.top();
     }
 
+    MemRec* call_proc(const std::string& name, PascalParser::ParameterListContext *paramsCtx) {
+        const auto it = procedures.find(name);
+        if (it == procedures.end()) {
+            throw std::runtime_error("Procedure is not bound");
+        }
+
+        const auto& proc = it->second;
+        auto args = std::any_cast<std::vector<MemRec*>>(visitParameterList(paramsCtx));
+
+        const size_t argc = proc.arg_types.size();
+
+        for (size_t i = 0, j = 0; i < argc; i++) {
+            if (proc.arg_types[i] == TypeGroup::Reference) {
+                continue;
+            }
+            if (proc.arg_types[i] == TypeGroup::Variadic) {
+                break;
+            }
+            if (!BelongsToGroup(args[j]->type(), proc.arg_types[i])) {
+                throw std::runtime_error("Wrong argument type");
+            }
+            j++;
+        }
+
+        Runtime::ArgV argv;
+        bool ref = false;
+
+        std::stack<MemRec> frame; // could use vector, but its pointers can get invalidated on insertion
+
+        for (size_t i = 0, j = 0; i < argc; i++) {
+            if (proc.arg_types[i] == TypeGroup::Reference) {
+                ref = true;
+                continue;
+            }
+            if (proc.arg_types[i] == TypeGroup::Variadic) {
+                for (; j < args.size(); j++) {
+                    if (ref) {
+                        argv.push_back(args[j]);
+                        ref = false;
+                    } else {
+                        argv.push_back(&frame.emplace(*args[j]));
+                    }
+                }
+                break;
+            }
+
+            if (ref) {
+                argv.push_back(args[j]);
+                ref = false;
+            } else {
+                argv.push_back(&frame.emplace(*args[j]));
+            }
+
+            j++;
+        }
+
+        auto& res = *st_alloc(proc.ret_type);
+        //
+        proc.pfn(rt, res, argv);
+        //
+        return &res;
+    }
+
 public:
 
     explicit PascalEvaluator(Runtime& runtime, Debugger* debugger, const ProcStore& procedures)
@@ -329,68 +392,17 @@ public:
     }
 
     std::any visitProcedureStatement(PascalParser::ProcedureStatementContext *ctx) override {
-        const auto& name = ctx->identifier()->getText();
-
-        const auto it = procedures.find(name);
-        if (it == procedures.end()) {
-            throw std::runtime_error("Procedure is not bound");
-        }
-
-        const auto& proc = it->second;
-        auto args = std::any_cast<std::vector<MemRec*>>(visitParameterList(ctx->parameterList()));
-
-        const size_t argc = proc.arg_types.size();
-
-        for (size_t i = 0, j = 0; i < argc; i++) {
-            if (proc.arg_types[i] == TypeGroup::Reference) {
-                continue;
-            }
-            if (proc.arg_types[i] == TypeGroup::Variadic) {
-                break;
-            }
-            if (!BelongsToGroup(args[j]->type(), proc.arg_types[i])) {
-                throw std::runtime_error("Wrong argument type");
-            }
-            j++;
-        }
-
-        Runtime::ArgV argv;
-        bool ref = false;
-
-        std::stack<MemRec> frame; // could use vector, but its pointers can get invalidated on insertion
-
-        for (size_t i = 0, j = 0; i < argc; i++) {
-            if (proc.arg_types[i] == TypeGroup::Reference) {
-                ref = true;
-                continue;
-            }
-            if (proc.arg_types[i] == TypeGroup::Variadic) {
-                for (; j < args.size(); j++) {
-                    if (ref) {
-                        argv.push_back(args[j]);
-                        ref = false;
-                    } else {
-                        argv.push_back(&frame.emplace(*args[j]));
-                    }
-                }
-                break;
-            }
-
-            if (ref) {
-                argv.push_back(args[j]);
-                ref = false;
-            } else {
-                argv.push_back(&frame.emplace(*args[j]));
-            }
-
-            j++;
-        }
-
-        MemRec res(proc.ret_type);
+        st_save();
         //
-        proc.pfn(rt, res, argv);
+        call_proc(ctx->identifier()->getText(), ctx->parameterList());
         //
-        return res;
+        st_pop();
+
+        return {};
+    }
+
+    std::any visitFunctionDesignator(PascalParser::FunctionDesignatorContext *ctx) override {
+        return call_proc(ctx->identifier()->getText(), ctx->parameterList());
     }
 
     std::any visitParameterList(PascalParser::ParameterListContext *ctx) override {

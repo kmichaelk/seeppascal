@@ -7,6 +7,38 @@
 #include "seepruntime.h"
 #include "rt_helper.h"
 
+TEST(Seep_Examples, NativeProcedures) {
+    ContextLeakingDebugger debugger([](Seep::Context& ctx) {
+        EXPECT_EQ("NativeProcedures", ctx.get_program_name());
+
+        const Seep::MemRec* rec;
+
+        ASSERT_NO_THROW(rec = &ctx.vars().at("out"));
+        EXPECT_EQ(Seep::Type::Integer, rec->type());
+        EXPECT_EQ(42, rec->value._int);
+
+        ASSERT_NO_THROW(rec = &ctx.vars().at("ref"));
+        EXPECT_EQ(Seep::Type::Integer, rec->type());
+        EXPECT_EQ(43, rec->value._int);
+    });
+
+    std::stringstream ss;
+
+    Seep::Runtime rt(load_file("../../examples/native_procedures.pas"), ss, ss);
+    rt.bind_procedure("OutProc", {}, Seep::Type::Integer,
+        [](Seep::Runtime& rt, Seep::MemRec& out, const Seep::Runtime::ArgV& args) {
+           out.value._int = 42;
+        });
+    rt.bind_procedure("RefProc", { Seep::TypeGroup::Reference, Seep::TypeGroup::Numeric }, Seep::Type::Void,
+        [](Seep::Runtime& rt, Seep::MemRec& out, const Seep::Runtime::ArgV& args) {
+           args[0]->value._int = 43;
+        });
+    rt.attach_debugger(&debugger);
+
+    ASSERT_NO_THROW(rt.warm_up());
+    ASSERT_NO_THROW(rt.execute());
+}
+
 TEST(Seep_Examples, BuiltinsRefs) {
     ContextLeakingDebugger debugger([](Seep::Context& ctx) {
         EXPECT_EQ("BuiltinsRefs", ctx.get_program_name());

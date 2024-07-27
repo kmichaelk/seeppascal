@@ -2,8 +2,9 @@
 // Created by Michael on 13.05.2024.
 //
 
-#include <gtest.h>
+#include <gtest/gtest.h>
 #include <sstream>
+#include <cmath>
 #include "seepruntime.h"
 #include "rt_helper.h"
 

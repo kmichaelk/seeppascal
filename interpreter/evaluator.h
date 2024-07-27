@@ -465,6 +465,8 @@ public:
             visitStatement(ctx->statement());
             var.value._int++;
         }
+
+        return {};
     }
 };
 
